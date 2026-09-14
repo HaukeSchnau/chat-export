@@ -26,8 +26,8 @@ func TestLoadFixture(t *testing.T) {
 	if conv.DefaultModelSlug != "fixture-model" {
 		t.Errorf("model = %q", conv.DefaultModelSlug)
 	}
-	if got := len(conv.LinearConversation); got != 14 {
-		t.Errorf("linear conversation has %d nodes, want 14", got)
+	if got := len(conv.LinearConversation); got != 15 {
+		t.Errorf("linear conversation has %d nodes, want 15", got)
 	}
 	var refs, images int
 	for _, node := range conv.LinearConversation {
@@ -63,8 +63,8 @@ func TestPartsImageAlt(t *testing.T) {
 		}
 	}
 	want := []string{
-		"park.jpg|file_00000000000000000000000001",                      // user upload: attachment name
-		"A picnic blanket under a tree|file_00000000000000000000000002", // generated: prompt
+		"park.jpg|file_00000000000000000000000001",        // user upload: attachment name
+		"Generated image|file_00000000000000000000000002", // tool output: share-id suffix stripped
 	}
 	if strings.Join(alts, ",") != strings.Join(want, ",") {
 		t.Errorf("image alts = %v, want %v", alts, want)

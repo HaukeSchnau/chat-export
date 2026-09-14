@@ -71,7 +71,7 @@ func TestRenderFixture(t *testing.T) {
 	checks := map[string]string{
 		"front matter":        "---\ntitle: \"Fixture: Picnic Planning 🧺\"\nsource: https://chatgpt.com/share/x\nmodel: fixture-model\n",
 		"user image":          "## User\n\n![park.jpg](assets/file_00000000000000000000000001.jpg)\n\nPlan a picnic",
-		"image placeholder":   "*[image: A picnic blanket under a tree]*",
+		"generated image":     "## ChatGPT\n\n*[image: Generated image]*\n\n```json",
 		"demoted heading":     "\n## Picnic plan\n",
 		"fenced heading kept": "```md\n# not a heading\n```",
 		"single citation":     "shade. ([weather.example](https://weather.example/forecast)) Saturday",

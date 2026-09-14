@@ -41,6 +41,10 @@ func Render(conv *share.Conversation, opts Options) (string, []string) {
 			r.paragraph(body)
 		case "assistant":
 			r.assistant(msg)
+		case "tool":
+			// Generated images arrive as tool output; the UI shows them as
+			// part of the answer. Tool text is never shown.
+			r.toolImages(msg)
 		}
 	}
 	return r.out.String(), r.warnings
@@ -143,21 +147,42 @@ func (r *renderer) parts(msg *share.Message) (string, []share.RefSource) {
 			texts = append(texts, p.Text)
 			continue
 		}
-		src := ""
-		if r.opts.ImageSrc != nil {
-			src = r.opts.ImageSrc(*p.Image)
-		}
-		if src == "" {
-			images = append(images, fmt.Sprintf("*[image: %s]*", p.Image.Alt))
-			continue
-		}
-		images = append(images, fmt.Sprintf("![%s](%s)", p.Image.Alt, src))
+		images = append(images, r.image(*p.Image))
 	}
 	body, sources := spliceReferences(strings.Join(texts, "\n\n"), msg.Metadata.ContentReferences)
 	if body != "" {
 		images = append(images, body)
 	}
 	return strings.Join(images, "\n\n"), sources
+}
+
+func (r *renderer) toolImages(msg *share.Message) {
+	if msg.Content.ContentType != "multimodal_text" {
+		return
+	}
+	var images []string
+	for _, p := range msg.Parts() {
+		if p.Image != nil {
+			images = append(images, r.image(*p.Image))
+		}
+	}
+	if len(images) > 0 {
+		r.section("ChatGPT")
+		r.paragraph(strings.Join(images, "\n\n"))
+	}
+}
+
+// image renders one image part as a Markdown image, or a placeholder when
+// it cannot be resolved.
+func (r *renderer) image(img share.ImagePart) string {
+	src := ""
+	if r.opts.ImageSrc != nil {
+		src = r.opts.ImageSrc(img)
+	}
+	if src == "" {
+		return fmt.Sprintf("*[image: %s]*", img.Alt)
+	}
+	return fmt.Sprintf("![%s](%s)", img.Alt, src)
 }
 
 func renderThoughts(thoughts []share.Thought) string {

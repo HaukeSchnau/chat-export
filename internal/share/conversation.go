@@ -133,6 +133,7 @@ func (m *Message) Parts() []Part {
 				DallE *struct {
 					Prompt string `json:"prompt"`
 				} `json:"dalle"`
+				Generation *struct{} `json:"generation"`
 			} `json:"metadata"`
 		}
 		if err := json.Unmarshal(raw, &part); err != nil || part.ContentType != "image_asset_pointer" {
@@ -144,6 +145,9 @@ func (m *Message) Parts() []Part {
 			continue
 		}
 		img := &ImagePart{FileID: FileID(part.AssetPointer), Width: part.Width, Height: part.Height, Alt: "image"}
+		if part.Metadata.DallE != nil || part.Metadata.Generation != nil {
+			img.Alt = "Generated image"
+		}
 		if part.Metadata.DallE != nil && part.Metadata.DallE.Prompt != "" {
 			img.Alt = part.Metadata.DallE.Prompt
 		}

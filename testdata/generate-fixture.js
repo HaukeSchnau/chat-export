@@ -34,9 +34,10 @@ const specs = [
       ],
     }))() }],
   ['user', { content_type: 'text', parts: ['Draw the picnic and show me the shopping list as code.'] }, {}],
-  ['assistant', { content_type: 'multimodal_text', parts: [
-      { content_type: 'image_asset_pointer', asset_pointer: 'sediment://file_00000000000000000000000002', size_bytes: 8765, width: 1024, height: 1024, fovea: null, metadata: { dalle: { gen_id: 'gen1', prompt: 'A picnic blanket under a tree', seed: 1, serialization_title: 'DALL-E generation metadata' }, sanitized: true } },
-    ] }, { metadata: {} }],
+  ['assistant', { content_type: 'code', language: 'json', text: '{"prompt":null,"n":1}' }, { recipient: 'image_gen.text2im', metadata: {} }],
+  ['tool', { content_type: 'multimodal_text', parts: [
+      { content_type: 'image_asset_pointer', asset_pointer: `sediment://file_00000000000000000000000002?shared_conversation_id=${SHARE_ID}`, size_bytes: 8765, width: 1024, height: 1024, mime_type: 'image/png', metadata: { dalle: { gen_id: 'gen1', prompt: '', serialization_title: 'DALL-E generation metadata' }, generation: { gen_id: 'gen1', gen_size: 'image', height: 1024, width: 1024, serialization_title: 'Image Generation metadata' }, sanitized: false } },
+    ] }, { author: { role: 'tool', name: 'image_gen.text2im' }, metadata: {} }],
   ['assistant', { content_type: 'code', language: 'json', text: '{"list": ["blanket", "fruit"]}' }, { recipient: 'all', metadata: {} }],
   ['assistant', { content_type: 'text', parts: ['Here is the drawing and the list. Enjoy! 😀'] }, { end_turn: true, metadata: {} }],
 ];
