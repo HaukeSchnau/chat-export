@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/haukeschnau/chatgpt-exporter/internal/convo"
+	"github.com/haukeschnau/chat-export/internal/convo"
 )
 
 // Snapshot is the subset of the chat_snapshots payload the exporter uses.

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/haukeschnau/chatgpt-exporter/internal/turbostream"
+	"github.com/haukeschnau/chat-export/internal/turbostream"
 )
 
 // Conversation is the subset of the share payload the exporter relies on.

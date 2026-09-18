@@ -40,7 +40,7 @@ func FetchSnapshot(ctx context.Context, id string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "chatgpt-exporter (+https://github.com/haukeschnau/chatgpt-exporter)")
+	req.Header.Set("User-Agent", "chat-export (+https://github.com/haukeschnau/chat-export)")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Sec-Fetch-Dest", "empty")
 	req.Header.Set("Sec-Fetch-Mode", "cors")

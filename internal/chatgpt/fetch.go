@@ -25,7 +25,7 @@ func ShareURL(id string) string {
 	return "https://chatgpt.com/share/" + id
 }
 
-const userAgent = "chatgpt-exporter (+https://github.com/haukeschnau/chatgpt-exporter)"
+const userAgent = "chat-export (+https://github.com/haukeschnau/chat-export)"
 
 // FetchHTML downloads the server-rendered share page.
 func FetchHTML(ctx context.Context, id string) (string, error) {

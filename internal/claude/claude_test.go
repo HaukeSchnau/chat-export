@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/haukeschnau/chatgpt-exporter/internal/convo"
+	"github.com/haukeschnau/chat-export/internal/convo"
 )
 
 func fixture(t *testing.T) []byte {

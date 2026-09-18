@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/haukeschnau/chatgpt-exporter/internal/chatgpt"
-	"github.com/haukeschnau/chatgpt-exporter/internal/claude"
-	"github.com/haukeschnau/chatgpt-exporter/internal/convo"
+	"github.com/haukeschnau/chat-export/internal/chatgpt"
+	"github.com/haukeschnau/chat-export/internal/claude"
+	"github.com/haukeschnau/chat-export/internal/convo"
 )
 
 func TestDemoteHeadings(t *testing.T) {

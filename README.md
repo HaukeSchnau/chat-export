@@ -1,11 +1,11 @@
-# chatgpt-exporter
+# chat-export
 
 Downloads a public ChatGPT or Claude share link and exports the conversation
 as Markdown.
 
 ```sh
-nix run github:haukeschnau/chatgpt-exporter -- https://chatgpt.com/share/<id> -o chat.md
-nix run github:haukeschnau/chatgpt-exporter -- https://claude.ai/share/<id> -o chat.md
+nix run github:haukeschnau/chat-export -- https://chatgpt.com/share/<id> -o chat.md
+nix run github:haukeschnau/chat-export -- https://claude.ai/share/<id> -o chat.md
 ```
 
 Flags:

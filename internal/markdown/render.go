@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/haukeschnau/chatgpt-exporter/internal/convo"
+	"github.com/haukeschnau/chat-export/internal/convo"
 )
 
 type Options struct {

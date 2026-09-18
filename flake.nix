@@ -1,5 +1,5 @@
 {
-  description = "Export public ChatGPT share links as Markdown";
+  description = "Export public ChatGPT and Claude share links as Markdown";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -11,11 +11,11 @@
     {
       packages = forAllSystems (pkgs: {
         default = pkgs.buildGoModule {
-          pname = "chatgpt-exporter";
+          pname = "chat-export";
           version = "0.1.0";
           src = ./.;
           vendorHash = null; # standard library only
-          meta.mainProgram = "chatgpt-exporter";
+          meta.mainProgram = "chat-export";
         };
       });
 

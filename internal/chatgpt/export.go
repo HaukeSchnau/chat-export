@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/haukeschnau/chatgpt-exporter/internal/convo"
+	"github.com/haukeschnau/chat-export/internal/convo"
 )
 
 // Export converts the share payload into the neutral model, mirroring what

@@ -1,4 +1,4 @@
-// Command chatgpt-exporter downloads a public ChatGPT or Claude share link
+// Command chat-export downloads a public ChatGPT or Claude share link
 // and prints the conversation as Markdown.
 package main
 
@@ -12,10 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/haukeschnau/chatgpt-exporter/internal/chatgpt"
-	"github.com/haukeschnau/chatgpt-exporter/internal/claude"
-	"github.com/haukeschnau/chatgpt-exporter/internal/convo"
-	"github.com/haukeschnau/chatgpt-exporter/internal/markdown"
+	"github.com/haukeschnau/chat-export/internal/chatgpt"
+	"github.com/haukeschnau/chat-export/internal/claude"
+	"github.com/haukeschnau/chat-export/internal/convo"
+	"github.com/haukeschnau/chat-export/internal/markdown"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 
 func run() error {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage: chatgpt-exporter [flags] <share-url-or-id>\n\nSupports https://chatgpt.com/share/... and https://claude.ai/share/... links.\n\n")
+		fmt.Fprintf(os.Stderr, "usage: chat-export [flags] <share-url-or-id>\n\nSupports https://chatgpt.com/share/... and https://claude.ai/share/... links.\n\n")
 		flag.PrintDefaults()
 	}
 	output := flag.String("o", "", "write to this file instead of stdout")
@@ -38,7 +38,7 @@ func run() error {
 	thoughts := flag.Bool("thoughts", false, "include reasoning summaries and thinking preambles")
 	flag.Parse()
 	// Go's flag package stops at the first positional argument; also accept
-	// flags after the URL, as in "chatgpt-exporter <url> -o out.md".
+	// flags after the URL, as in "chat-export <url> -o out.md".
 	args := flag.Args()
 	if len(args) > 1 {
 		if err := flag.CommandLine.Parse(args[1:]); err != nil {
