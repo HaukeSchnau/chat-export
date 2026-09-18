@@ -1,4 +1,4 @@
-package markdown
+package chatgpt
 
 import (
 	"fmt"
@@ -7,8 +7,6 @@ import (
 	"sort"
 	"strings"
 	"unicode/utf16"
-
-	"github.com/haukeschnau/chatgpt-exporter/internal/share"
 )
 
 // spliceReferences replaces citation markers in text with Markdown links and
@@ -18,9 +16,9 @@ import (
 // JavaScript, so the text is converted before slicing. Each marker is verified
 // against matched_text; on mismatch the marker is located by searching for
 // matched_text instead, and if that fails it is left for the final cleanup.
-func spliceReferences(text string, refs []share.ContentReference) (string, []share.RefSource) {
+func spliceReferences(text string, refs []ContentReference) (string, []RefSource) {
 	units := utf16.Encode([]rune(text))
-	var sources []share.RefSource
+	var sources []RefSource
 
 	type edit struct {
 		start, end  int
@@ -64,7 +62,7 @@ func spliceReferences(text string, refs []share.ContentReference) (string, []sha
 }
 
 // locate returns the UTF-16 range of a reference marker, or -1 if not found.
-func locate(units []uint16, ref share.ContentReference) (int, int) {
+func locate(units []uint16, ref ContentReference) (int, int) {
 	matched := utf16.Encode([]rune(ref.MatchedText))
 	if ref.StartIdx >= 0 && ref.EndIdx <= len(units) && ref.StartIdx <= ref.EndIdx {
 		if len(matched) == 0 || equalUnits(units[ref.StartIdx:ref.EndIdx], matched) {
@@ -81,7 +79,7 @@ func locate(units []uint16, ref share.ContentReference) (int, int) {
 
 // inlineCitation renders a grouped_webpages reference the way ChatGPT's own
 // alt text does: "([site](url), [site2](url2))".
-func inlineCitation(ref share.ContentReference) string {
+func inlineCitation(ref ContentReference) string {
 	var links []string
 	seen := map[string]bool{}
 	for _, item := range ref.Items {

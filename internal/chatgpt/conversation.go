@@ -1,5 +1,6 @@
-// Package share loads a public ChatGPT share page into a typed conversation.
-package share
+// Package chatgpt loads a public ChatGPT share page into a typed conversation
+// and converts it to the neutral model.
+package chatgpt
 
 import (
 	"encoding/json"

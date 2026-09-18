@@ -1,4 +1,4 @@
-package share
+package chatgpt
 
 import (
 	"context"

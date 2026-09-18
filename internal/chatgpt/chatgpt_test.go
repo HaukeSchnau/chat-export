@@ -1,4 +1,4 @@
-package share
+package chatgpt
 
 import (
 	"os"
@@ -121,4 +121,17 @@ func fixtureHTML(t *testing.T) string {
 		t.Fatal(err)
 	}
 	return string(html)
+}
+
+func TestExport(t *testing.T) {
+	conv, warnings := loadFixture(t).Export()
+	if len(warnings) != 0 {
+		t.Errorf("warnings: %v", warnings)
+	}
+	if conv.Provider != "chatgpt" || conv.Model != "fixture-model" || len(conv.Turns) != 4 {
+		t.Errorf("conv = provider %q model %q turns %d", conv.Provider, conv.Model, len(conv.Turns))
+	}
+	if conv.Created.IsZero() || !conv.Updated.After(conv.Created) || conv.Shared.IsZero() {
+		t.Errorf("times = %v %v %v", conv.Created, conv.Updated, conv.Shared)
+	}
 }

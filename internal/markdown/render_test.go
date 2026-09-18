@@ -5,41 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/haukeschnau/chatgpt-exporter/internal/share"
+	"github.com/haukeschnau/chatgpt-exporter/internal/chatgpt"
+	"github.com/haukeschnau/chatgpt-exporter/internal/claude"
+	"github.com/haukeschnau/chatgpt-exporter/internal/convo"
 )
-
-func TestSpliceReferences(t *testing.T) {
-	// "\U0001F600" is a surrogate pair, which shifts JavaScript offsets relative
-	// to rune offsets. The second marker has no reference and must be dropped.
-	text := "\U0001F600 Gerrit is solid.\uE200cite\uE202turn0search7\uE201 More.\uE200cite\uE202turn0search9\uE201"
-	refs := []share.ContentReference{
-		{
-			Type: "grouped_webpages", MatchedText: "\uE200cite\uE202turn0search7\uE201", StartIdx: 19, EndIdx: 38,
-			Items: []share.RefSource{{Attribution: "gerrit.example", URL: "https://gerrit.example/docs?utm_source=chatgpt.com&x=1"}},
-		},
-		{
-			Type: "sources_footnote", MatchedText: " ", StartIdx: 63, EndIdx: 64,
-			Sources: []share.RefSource{{Title: "Gerrit docs", URL: "https://gerrit.example/docs"}},
-		},
-	}
-	got, sources := spliceReferences(text, refs)
-	want := "\U0001F600 Gerrit is solid. ([gerrit.example](https://gerrit.example/docs?x=1)) More."
-	if got != want {
-		t.Errorf("got  %q\nwant %q", got, want)
-	}
-	if len(sources) != 1 || sources[0].Title != "Gerrit docs" {
-		t.Errorf("sources = %+v", sources)
-	}
-}
-
-func TestSpliceReferencesFallsBackToSearch(t *testing.T) {
-	marker := "\uE200cite\uE202turn1search2\uE201"
-	refs := []share.ContentReference{{Type: "grouped_webpages", MatchedText: marker, StartIdx: 99, EndIdx: 120, Items: []share.RefSource{{Attribution: "x", URL: "https://x.test"}}}}
-	got, _ := spliceReferences("A"+marker+" B", refs)
-	if got != "A ([x](https://x.test)) B" {
-		t.Errorf("got %q", got)
-	}
-}
 
 func TestDemoteHeadings(t *testing.T) {
 	in := "## Title\n```md\n# not a heading\n```\n#hashtag\n###### six"
@@ -49,27 +18,43 @@ func TestDemoteHeadings(t *testing.T) {
 	}
 }
 
-func TestRenderFixture(t *testing.T) {
-	conv, _, err := share.Load(fixtureHTML(t))
+func expect(t *testing.T, doc string, wanted map[string]string, unwanted map[string]string) {
+	t.Helper()
+	for name, want := range wanted {
+		if !strings.Contains(doc, want) {
+			t.Errorf("%s: output lacks %q", name, want)
+		}
+	}
+	for name, s := range unwanted {
+		if strings.Contains(doc, s) {
+			t.Errorf("%s: output contains %q", name, s)
+		}
+	}
+}
+
+func TestRenderChatGPT(t *testing.T) {
+	html, err := os.ReadFile("../../testdata/share.html")
 	if err != nil {
 		t.Fatal(err)
 	}
-	var requested []string
-	doc, warnings := Render(conv, Options{
-		SourceURL: "https://chatgpt.com/share/x",
-		ImageSrc: func(img share.ImagePart) string {
-			requested = append(requested, img.FileID)
-			if strings.HasSuffix(img.FileID, "2") {
-				return "" // simulate a failed download
-			}
-			return "assets/" + img.FileID + ".jpg"
-		},
-	})
+	raw, _, err := chatgpt.Load(string(html))
+	if err != nil {
+		t.Fatal(err)
+	}
+	conv, warnings := raw.Export()
 	if len(warnings) != 0 {
 		t.Errorf("warnings: %v", warnings)
 	}
-	checks := map[string]string{
-		"front matter":        "---\ntitle: \"Fixture: Picnic Planning 🧺\"\nsource: https://chatgpt.com/share/x\nmodel: fixture-model\n",
+	var requested []string
+	doc := Render(conv, Options{ImageSrc: func(img convo.ImageRef) string {
+		requested = append(requested, img.ID)
+		if strings.HasSuffix(img.ID, "2") {
+			return "" // simulate a failed download
+		}
+		return "assets/" + img.ID + ".jpg"
+	}})
+	expect(t, doc, map[string]string{
+		"front matter":        "---\ntitle: \"Fixture: Picnic Planning 🧺\"\nprovider: chatgpt\nsource: https://chatgpt.com/share/00000000-0000-4000-8000-000000000001\nmodel: fixture-model\n",
 		"user image":          "## User\n\n![park.jpg](assets/file_00000000000000000000000001.jpg)\n\nPlan a picnic",
 		"generated image":     "## ChatGPT\n\n*[image: Generated image]*\n\n```json",
 		"demoted heading":     "\n## Picnic plan\n",
@@ -79,25 +64,15 @@ func TestRenderFixture(t *testing.T) {
 		"sources list":        "**Sources**\n\n- [Weekend forecast](https://weather.example/forecast)\n- [Packing list](https://picnics.example/list)",
 		"code message":        "```json\n{\"list\": [\"blanket\", \"fruit\"]}\n```",
 		"final answer":        "Here is the drawing and the list. Enjoy! 😀",
-	}
-	for name, want := range checks {
-		if !strings.Contains(doc, want) {
-			t.Errorf("%s: output lacks %q", name, want)
-		}
-	}
-	for name, unwanted := range map[string]string{
+	}, map[string]string{
 		"stale marker":        "turn0view9",
 		"hidden marker":       "memcite",
-		"delimiter":           "\uE200",
+		"delimiter":           "",
 		"tracking parameter":  "utm_source",
 		"preamble":            "I will check the local weather",
 		"tool output":         "redacted",
 		"custom instructions": "custom instructions",
-	} {
-		if strings.Contains(doc, unwanted) {
-			t.Errorf("%s: output contains %q", name, unwanted)
-		}
-	}
+	})
 	if got := strings.Count(doc, "\n## User\n"); got != 2 {
 		t.Errorf("%d user turns, want 2", got)
 	}
@@ -108,24 +83,37 @@ func TestRenderFixture(t *testing.T) {
 		t.Errorf("image resolver called %d times, want 2", len(requested))
 	}
 
-	withThoughts, _ := Render(conv, Options{IncludeThoughts: true})
-	for _, want := range []string{"> **Looking at the park**\n>\n> The photo shows", "> I will check the local weather", "*Worked for 4s*"} {
-		if !strings.Contains(withThoughts, want) {
-			t.Errorf("thoughts output lacks %q", want)
-		}
-	}
-	if strings.Contains(withThoughts, "Looked at the park") {
-		t.Error("empty thought should be skipped")
-	}
+	withThoughts := Render(conv, Options{IncludeThoughts: true})
+	expect(t, withThoughts, map[string]string{
+		"thought":  "> **Looking at the park**\n>\n> The photo shows",
+		"preamble": "> I will check the local weather",
+		"recap":    "> Worked for 4s",
+	}, map[string]string{"empty thought": "Looked at the park"})
 }
 
-// fixtureHTML returns the synthetic share page in testdata, generated by
-// testdata/generate-fixture.js with the real turbo-stream encoder.
-func fixtureHTML(t *testing.T) string {
-	t.Helper()
-	html, err := os.ReadFile("../../testdata/share.html")
+func TestRenderClaude(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/claude-snapshot.json")
 	if err != nil {
 		t.Fatal(err)
 	}
-	return string(html)
+	snap, err := claude.Parse(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	conv, _ := snap.Export()
+	doc := Render(conv, Options{})
+	expect(t, doc, map[string]string{
+		"front matter":    "---\ntitle: \"Fixture: Planning a Picnic 🧺\"\nprovider: claude\nsource: https://claude.ai/share/00000000-0000-4000-8000-00000000c1a0\ncreated: 2024-01-01T09:00:00Z\nupdated: 2024-01-01T09:01:10Z\nshared: 2024-01-02T10:00:00Z\n---",
+		"attachment":      "## User\n\n*[1 attachment not included in share]*\n\nPlan a picnic",
+		"demoted heading": "## Claude\n\n## Picnic plan\n",
+		"artifact link":   "*Artifact: [Picnic Checklist](https://claude.ai/code/artifact/00000000-0000-4000-8000-0000000000a1)*",
+		"legacy text":     "## User\n\nThanks! Anything else?",
+		"final":           "## Claude\n\nSunscreen. Enjoy! 😀",
+	}, map[string]string{
+		"model line": "model:",
+		"thinking":   "shade trees",
+		"tool name":  "Claude Docs",
+	})
+	withThoughts := Render(conv, Options{IncludeThoughts: true})
+	expect(t, withThoughts, map[string]string{"thought": "> **Looking at the park**\n>\n> The photo shows"}, nil)
 }

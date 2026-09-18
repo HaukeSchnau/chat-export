@@ -1,9 +1,11 @@
 # chatgpt-exporter
 
-Downloads a public ChatGPT share link and exports the conversation as Markdown.
+Downloads a public ChatGPT or Claude share link and exports the conversation
+as Markdown.
 
 ```sh
 nix run github:haukeschnau/chatgpt-exporter -- https://chatgpt.com/share/<id> -o chat.md
+nix run github:haukeschnau/chatgpt-exporter -- https://claude.ai/share/<id> -o chat.md
 ```
 
 Flags:
@@ -30,7 +32,9 @@ payload and cannot be exported.
 
 ## Tests
 
-`testdata/share.html` is a synthetic share page produced by
+`testdata/share.html` is a synthetic ChatGPT share page produced by
 `testdata/generate-fixture.js` using the real `turbo-stream` encoder, so the
 decoder is tested against the genuine wire format without any real chat data.
 Regenerate it with `bun add turbo-stream@2 && bun testdata/generate-fixture.js testdata/share.html`.
+`testdata/claude-snapshot.json` is a hand-written snapshot in the same shape
+the Claude API returns.

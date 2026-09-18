@@ -1,0 +1,56 @@
+{
+  "uuid": "00000000-0000-4000-8000-00000000c1a0",
+  "conversation_uuid": "00000000-0000-4000-8000-00000000c0de",
+  "created_at": "2024-01-02T10:00:00.000000Z",
+  "updated_at": "2024-01-02T10:00:00.000000Z",
+  "snapshot_name": "Fixture: Planning a Picnic 🧺",
+  "created_by": "Fixture",
+  "creator": {"uuid": "00000000-0000-4000-8000-0000000000aa", "full_name": "Fixture"},
+  "project_uuid": null,
+  "is_public": true,
+  "up_to_date": true,
+  "working_documents": [],
+  "chat_messages": [
+    {
+      "uuid": "msg-0001", "sender": "human", "index": 0,
+      "created_at": "2024-01-01T09:00:00.000000Z", "updated_at": "2024-01-01T09:00:00.000000Z",
+      "parent_message_uuid": "00000000-0000-4000-8000-000000000000",
+      "text": "", "attachments": [], "files": [], "file_count": 1, "image_count": 0,
+      "content": [
+        {"type": "text", "text": "Plan a picnic for the park in the attached photo 🌳.", "citations": []}
+      ]
+    },
+    {
+      "uuid": "msg-0002", "sender": "assistant", "index": 1,
+      "created_at": "2024-01-01T09:00:10.000000Z", "updated_at": "2024-01-01T09:00:20.000000Z",
+      "parent_message_uuid": "msg-0001", "stop_reason": "end_turn",
+      "text": "", "attachments": [], "files": [], "file_count": 0, "image_count": 0,
+      "content": [
+        {"type": "thinking", "thinking": "The photo shows a lawn with shade trees, so a blanket and cold drinks matter most.", "summaries": [{"summary": "Looking at the park"}], "cut_off": false},
+        {"type": "text", "text": "# Picnic plan\n\nBring a blanket, water, and shade.\n\n## Packing list\n\n- Blanket 🧺\n- Fruit\n\n```md\n# not a heading\n```", "citations": []},
+        {"type": "tool_use", "id": "toolu_1", "name": "Artifact", "input": null, "display_content": null},
+        {"type": "tool_result", "tool_use_id": "toolu_1", "name": "Artifact", "content": [], "is_error": false,
+         "display_content": {"type": "file", "published_url": "https://claude.ai/code/artifact/00000000-0000-4000-8000-0000000000a1", "published_artifact_id": "00000000-0000-4000-8000-0000000000a1", "published_action": "opened", "title": "Picnic Checklist"}},
+        {"type": "tool_use", "id": "toolu_2", "name": "Claude Docs:update", "input": null, "display_content": null},
+        {"type": "tool_result", "tool_use_id": "toolu_2", "name": "Claude Docs:update", "content": [], "is_error": false, "display_content": null},
+        {"type": "text", "text": "The checklist is in the artifact.", "citations": []}
+      ]
+    },
+    {
+      "uuid": "msg-0003", "sender": "human", "index": 2,
+      "created_at": "2024-01-01T09:01:00.000000Z", "updated_at": "2024-01-01T09:01:00.000000Z",
+      "parent_message_uuid": "msg-0002",
+      "text": "Thanks! Anything else?", "attachments": [], "files": [], "file_count": 0, "image_count": 0,
+      "content": []
+    },
+    {
+      "uuid": "msg-0004", "sender": "assistant", "index": 3,
+      "created_at": "2024-01-01T09:01:05.000000Z", "updated_at": "2024-01-01T09:01:10.000000Z",
+      "parent_message_uuid": "msg-0003", "stop_reason": "end_turn",
+      "text": "", "attachments": [], "files": [], "file_count": 0, "image_count": 0,
+      "content": [
+        {"type": "text", "text": "Sunscreen. Enjoy! 😀", "citations": []}
+      ]
+    }
+  ]
+}
