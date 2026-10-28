@@ -38,3 +38,4 @@ decoder is tested against the genuine wire format without any real chat data.
 Regenerate it with `bun add turbo-stream@2 && bun testdata/generate-fixture.js testdata/share.html`.
 `testdata/claude-snapshot.json` is a hand-written snapshot in the same shape
 the Claude API returns.
+
